@@ -19,12 +19,31 @@ async def generate_voiceover(text, output_file):
     await communicate.save(output_file)
 
 def get_pexels_video(query):
+    """Mencari video vertikal dari Pexels dengan pengecekan error"""
     url = f"https://api.pexels.com/videos/search?query={query}&per_page=1&orientation=portrait"
     headers = {"Authorization": PEXELS_API_KEY}
-    r = requests.get(url, headers=headers).json()
-    video_url = r['videos'][0]['video_files'][0]['link']
+    
+    response = requests.get(url, headers=headers)
+    
+    # Cek apakah API Key benar (Status 200 artinya OK)
+    if response.status_code != 200:
+        raise Exception(f"Gagal akses Pexels! Status: {response.status_code}. Cek API Key kamu.")
+    
+    data = response.json()
+    
+    # Cek apakah hasil pencarian ada
+    if 'videos' not in data or len(data['videos']) == 0:
+        print(f"Peringatan: Tidak ada video ditemukan untuk '{query}'. Mencoba keyword cadangan...")
+        # Jika keyword gagal, coba cari video umum agar tidak error
+        return get_pexels_video("nature") 
+    
+    video_url = data['videos'][0]['video_files'][0]['link']
+    print(f"Berhasil menemukan video: {video_url}")
+    
+    video_data = requests.get(video_url).content
     with open("temp_video.mp4", "wb") as f:
-        f.write(requests.get(video_url).content)
+        f.write(video_data)
+        
     return "temp_video.mp4"
 
 def create_video(naskah, video_file, audio_file, output_name):
