@@ -10,9 +10,9 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Konfigurasi API
-PEXELS_API_KEY = os.getenv("PEXELS_API_KEY")
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
+PEXELS_API_KEY = os.getenv("CTOSBStDiUeN9IzkbchNucmkH9XeybYaQXi7bTR6mCNKOsC00XaCvmiu")
+TELEGRAM_BOT_TOKEN = os.getenv("8241914436:AAFLyo78YJksGry4lk2MmZVr0FwbqvzWgT0")
+TELEGRAM_CHAT_ID = os.getenv("5466946750")
 
 async def generate_voiceover(text, output_file):
     communicate = edge_tts.Communicate(text, "id-ID-ArdiNeural")
