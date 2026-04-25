@@ -1,0 +1,33 @@
+name: Auto Generate Video
+
+on:
+  workflow_dispatch: # Biar bisa dijalankan manual dari HP lewat web GitHub
+  schedule:
+    - cron: '0 0 * * *' # Otomatis jalan setiap jam 7 pagi WIB (00:00 UTC)
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Install Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y imagemagick ffmpeg
+          # Bypass policy security ImageMagick agar bisa render teks
+          sudo sed -i 's/domain="path" rights="none" pattern="@\*"/domain="path" rights="read|write" pattern="@\*"/g' /etc/ImageMagick-6/policy.xml
+          pip install moviepy requests python-dotenv edge-tts python-telegram-bot
+
+      - name: Create Video and Send to Telegram
+        env:
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python main.py
